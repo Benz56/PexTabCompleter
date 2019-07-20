@@ -22,7 +22,6 @@ public final class PexTabCompleter extends JavaPlugin {
     private static final Supplier<List<String>> WORLDS = () -> Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList());
     private static final Supplier<List<String>> GROUPS = () -> new ArrayList<>(PermissionsEx.getPermissionManager().getGroupNames());
     private static final Supplier<List<String>> RANK_LADDERS = () -> PermissionsEx.getPermissionManager().getGroupList().stream().map(PermissionGroup::getRankLadder).distinct().collect(Collectors.toList());
-
     private static final List<PexCommand> PEX_COMMANDS = Arrays.asList(
             PexCommand.builder().command(toArray("config node *")).build(),
             PexCommand.builder().command(toArray("hierarchy [world]")).indexSuggestions(ImmutableMap.of(1, WORLDS)).build(),
@@ -79,9 +78,9 @@ public final class PexTabCompleter extends JavaPlugin {
             PexCommand.builder().command(toArray("world *")).indexSuggestions(ImmutableMap.of(1, WORLDS)).build(),
             PexCommand.builder().command(toArray("world * inherit *")).indexSuggestions(ImmutableMap.of(1, WORLDS, 3, WORLDS)).build()
     );
-
     private static final Function<CommandSender, Boolean> PERMISSIBLE = commandSender -> commandSender.isOp() || commandSender.hasPermission("pextabcompleter.use");
     private static final BiFunction<Stream<String>, String, List<String>> STRING_FILTER = (strings, currentInput) -> strings.filter(string -> string.toLowerCase().startsWith(currentInput.toLowerCase())).collect(Collectors.toList());
+
 
     @Override
     public void onEnable() {
@@ -92,15 +91,7 @@ public final class PexTabCompleter extends JavaPlugin {
             }
             return STRING_FILTER.apply(PEX_COMMANDS.stream().filter(pexCommand -> pexCommand.isCommand(args)).flatMap(pexCommand -> pexCommand.getSuggestions(args).stream()).distinct(), args[args.length - 1]);
         });
-
-        Arrays.asList("promote", "demote").forEach(cmd -> Objects.requireNonNull(getPlugin(PermissionsEx.class).getCommand(cmd)).setTabCompleter((sender, command, alias, args) -> {
-            if (args.length == 1) {
-                return STRING_FILTER.apply(ONLINE_PLAYERS.get().stream(), args[0]);
-            } else if (args.length == 2) {
-                return STRING_FILTER.apply(RANK_LADDERS.get().stream(), args[1]);
-            }
-            return Collections.emptyList();
-        }));
+        Arrays.asList("promote", "demote").forEach(cmd -> Objects.requireNonNull(getPlugin(PermissionsEx.class).getCommand(cmd)).setTabCompleter((sender, command, alias, args) -> args.length == 1 ? STRING_FILTER.apply(ONLINE_PLAYERS.get().stream(), args[0]) : args.length == 2 ? STRING_FILTER.apply(RANK_LADDERS.get().stream(), args[1]) : Collections.emptyList()));
     }
 
     private static String[] toArray(final String command) {
