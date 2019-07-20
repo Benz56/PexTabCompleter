@@ -1,0 +1,8 @@
+name: PexTabCompleter
+version: ${project.version}
+main: com.benzoft.pextabcompleter.PexTabCompleter
+api-version: "1.13"
+depend: [PermissionsEx]
+authors: [Benz56]
+description: Allows tab completion of PermissionsEx commands.
+website: benzoft.com
