@@ -1,14 +1,11 @@
 package com.benzoft.pextabcompleter;
 
-import lombok.Getter;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-@Getter
 class PexCommand {
 
     private final String[] command;
