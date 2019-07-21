@@ -6,10 +6,10 @@
 
     <groupId>com.benzoft.pextabcompleter</groupId>
     <artifactId>pextabcompleter</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <packaging>jar</packaging>
 
-    <name>Pextabcompleter</name>
+    <name>PexTabCompleter</name>
 
     <description>Allows tab completion of PermissionsEx commands.</description>
     <properties>

@@ -1,6 +1,5 @@
 package com.benzoft.pextabcompleter;
 
-import lombok.Builder;
 import lombok.Getter;
 
 import java.util.Collections;
@@ -9,13 +8,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-@Builder
 @Getter
 class PexCommand {
 
     private final String[] command;
-    @Builder.Default
-    private final Map<Integer, Supplier<List<String>>> indexSuggestions = new HashMap<>();
+    private final Map<Integer, Supplier<List<String>>> indexSuggestions;
+
+    PexCommand(final String command) {
+        this(command, new HashMap<>());
+    }
+
+    PexCommand(final String command, final Map<Integer, Supplier<List<String>>> indexSuggestions) {
+        this.command = command.split(" ");
+        this.indexSuggestions = indexSuggestions;
+    }
 
     boolean isCommand(final String[] input) {
         try {
