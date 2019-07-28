@@ -8,14 +8,16 @@ import java.util.function.Supplier;
 
 class PexCommand {
 
+    private final PexTabCompleter pexTabCompleter;
     private final String[] command;
-    private final Map<Integer, Supplier<List<String>>> indexSuggestions;
+    private Map<Integer, Supplier<List<String>>> indexSuggestions;
 
-    PexCommand(final String command) {
-        this(command, new HashMap<>());
+    PexCommand(final PexTabCompleter pexTabCompleter, final String command) {
+        this(pexTabCompleter, command, new HashMap<>());
     }
 
-    PexCommand(final String command, final Map<Integer, Supplier<List<String>>> indexSuggestions) {
+    PexCommand(final PexTabCompleter pexTabCompleter, final String command, final Map<Integer, Supplier<List<String>>> indexSuggestions) {
+        this.pexTabCompleter = pexTabCompleter;
         this.command = command.split(" ");
         this.indexSuggestions = indexSuggestions;
     }
@@ -38,7 +40,9 @@ class PexCommand {
         try {
             final int lastWordIndex = input.length - 1;
             final String currentWord = input[lastWordIndex], nextWord = command[lastWordIndex];
-            if (!currentWord.isEmpty() && nextWord.startsWith(currentWord)) return Collections.singletonList(nextWord);
+            if (nextWord.equalsIgnoreCase("<permission>")) {
+                return pexTabCompleter.getPermissionSuggestions().apply(currentWord);
+            } else if (!currentWord.isEmpty() && nextWord.startsWith(currentWord)) return Collections.singletonList(nextWord);
             return nextWord.equalsIgnoreCase("*") ? indexSuggestions.getOrDefault(lastWordIndex, Collections::emptyList).get() : Collections.singletonList(nextWord);
         } catch (final ArrayIndexOutOfBoundsException e) {
             return Collections.emptyList();

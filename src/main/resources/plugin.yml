@@ -6,3 +6,6 @@ depend: [PermissionsEx]
 authors: [Benz56]
 description: Allows tab completion of PermissionsEx commands.
 website: benzoft.com
+permissions:
+  pextabcompleter.use:
+    description: Allows players to get tab suggestions for PEX commands.
