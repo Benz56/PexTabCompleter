@@ -10,7 +10,7 @@ class PexCommand {
 
     private final PexTabCompleter pexTabCompleter;
     private final String[] command;
-    private Map<Integer, Supplier<List<String>>> indexSuggestions;
+    private final Map<Integer, Supplier<List<String>>> indexSuggestions;
 
     PexCommand(final PexTabCompleter pexTabCompleter, final String command) {
         this(pexTabCompleter, command, new HashMap<>());

@@ -5,7 +5,6 @@ import com.benzoft.pextabcompleter.permissiontree.PermissionTree;
 import com.google.common.collect.ImmutableMap;
 import lombok.Getter;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 
@@ -22,7 +21,6 @@ import static com.benzoft.pextabcompleter.ArgSuggestion.*;
 
 public final class PexTabCompleter extends JavaPlugin {
 
-    private final static Function<CommandSender, Boolean> HAS_PERMISSION = commandSender -> commandSender.isOp() || commandSender.hasPermission("pextabcompleter.use");
     private final static BiFunction<Stream<String>, String, List<String>> STRING_FILTER = (strings, currentInput) -> strings.filter(string -> string.toLowerCase().startsWith(currentInput.toLowerCase())).collect(Collectors.toList());
 
     private final List<PexCommand> pexCommands = Arrays.asList(
@@ -98,13 +96,7 @@ public final class PexTabCompleter extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        Objects.requireNonNull(getPlugin(PermissionsEx.class).getCommand("pex")).setTabCompleter((sender, command, alias, args) -> {
-            if (!HAS_PERMISSION.apply(sender)) return null;
-            if (args.length == 1) {
-                return STRING_FILTER.apply(Stream.of("help", "user", "users", "group", "groups", "toggle", "reload", "config", "backend", "hierarchy", "import", "worlds", "world", "default", "set"), args[0]);
-            }
-            return STRING_FILTER.apply(pexCommands.stream().filter(pexCommand -> pexCommand.isCommand(args)).flatMap(pexCommand -> pexCommand.getSuggestions(args).stream()).distinct(), args[args.length - 1]);
-        });
+        Objects.requireNonNull(getPlugin(PermissionsEx.class).getCommand("pex")).setTabCompleter((sender, command, alias, args) -> !sender.isOp() && !sender.hasPermission("pextabcompleter.use") ? null : args.length == 1 ? STRING_FILTER.apply(Stream.of("help", "user", "users", "group", "groups", "toggle", "reload", "config", "backend", "hierarchy", "import", "worlds", "world", "default", "set"), args[0]) : STRING_FILTER.apply(pexCommands.stream().filter(pexCommand -> pexCommand.isCommand(args)).flatMap(pexCommand -> pexCommand.getSuggestions(args).stream()).distinct(), args[args.length - 1]));
         Arrays.asList("promote", "demote").forEach(cmd -> Objects.requireNonNull(getPlugin(PermissionsEx.class).getCommand(cmd)).setTabCompleter((sender, command, alias, args) -> args.length == 1 ? STRING_FILTER.apply(ONLINE_PLAYERS.getSupplier().get().stream(), args[0]) : args.length == 2 ? STRING_FILTER.apply(RANK_LADDERS.getSupplier().get().stream(), args[1]) : Collections.emptyList()));
         Bukkit.getScheduler().runTask(this, () -> Bukkit.getPluginManager().getPermissions().forEach(permission -> permissionTree.insert(permission.getName())));
     }
