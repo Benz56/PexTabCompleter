@@ -1,10 +1,10 @@
 package com.benzoft.pextabcompleter;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.benzoft.pextabcompleter.permissiontree.PermissionNode;
+
+import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 class PexCommand {
 
@@ -36,16 +36,24 @@ class PexCommand {
         }
     }
 
-    List<String> getSuggestions(final String[] input) {
+    List<String> getArgSuggestion(final String[] input) {
         try {
             final int lastWordIndex = input.length - 1;
             final String currentWord = input[lastWordIndex], nextWord = command[lastWordIndex];
             if (nextWord.equalsIgnoreCase("<permission>")) {
-                return pexTabCompleter.getPermissionSuggestions().apply(currentWord);
+                return getPermissionSuggestions(currentWord);
             } else if (!currentWord.isEmpty() && nextWord.startsWith(currentWord)) return Collections.singletonList(nextWord);
             return nextWord.equalsIgnoreCase("*") ? indexSuggestions.getOrDefault(lastWordIndex, Collections::emptyList).get() : Collections.singletonList(nextWord);
         } catch (final ArrayIndexOutOfBoundsException e) {
             return Collections.emptyList();
         }
+    }
+
+    private List<String> getPermissionSuggestions(final String current) {
+        PermissionNode end = pexTabCompleter.getPermissionTree().getRootNode();
+        for (final String node : Arrays.copyOfRange(current.split("\\.", -1), 0, current.split("\\.", -1).length - 1)) {
+            if ((end = end.getChildren().get(node)) == null) break;
+        }
+        return end != null ? end.getChildren().keySet().stream().map(s -> current.substring(0, current.lastIndexOf(".") + 1) + s).collect(Collectors.toList()) : Collections.emptyList();
     }
 }
