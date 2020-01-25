@@ -90,5 +90,6 @@ public final class PexTabCompleter extends JavaPlugin {
         Objects.requireNonNull(getPlugin(PermissionsEx.class).getCommand("pex")).setTabCompleter((sender, command, alias, args) -> !sender.isOp() && !sender.hasPermission("pextabcompleter.use") ? null : args.length == 1 ? STRING_FILTER.apply(Stream.of("help", "user", "users", "group", "groups", "toggle", "reload", "config", "backend", "hierarchy", "import", "worlds", "world", "default", "set"), args[0]) : STRING_FILTER.apply(pexCommands.stream().filter(pexCommand -> pexCommand.isCommand(args)).flatMap(pexCommand -> pexCommand.getArgSuggestion(args).stream()).distinct(), args[args.length - 1]));
         Arrays.asList("promote", "demote").forEach(cmd -> Objects.requireNonNull(getPlugin(PermissionsEx.class).getCommand(cmd)).setTabCompleter((sender, command, alias, args) -> args.length == 1 ? STRING_FILTER.apply(ONLINE_PLAYERS.getSupplier().get().stream(), args[0]) : args.length == 2 ? STRING_FILTER.apply(RANK_LADDERS.getSupplier().get().stream(), args[1]) : Collections.emptyList()));
         Bukkit.getScheduler().runTask(this, () -> Bukkit.getPluginManager().getPermissions().forEach(permission -> permissionTree.insert(permission.getName())));
+        new MetricsLite(this, 6352);
     }
 }
