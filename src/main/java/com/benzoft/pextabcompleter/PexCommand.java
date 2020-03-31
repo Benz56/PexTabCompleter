@@ -51,9 +51,9 @@ class PexCommand {
 
     private List<String> getPermissionSuggestions(final String current) {
         PermissionNode end = pexTabCompleter.getPermissionTree().getRootNode();
-        for (final String node : Arrays.copyOfRange(current.split("\\.", -1), 0, current.split("\\.", -1).length - 1)) {
+        for (final String node : Arrays.copyOfRange(current.substring(current.startsWith("-") ? 1 : 0).split("\\.", -1), 0, current.split("\\.", -1).length - 1)) {
             if ((end = end.getChildren().get(node)) == null) break;
         }
-        return end != null ? end.getChildren().keySet().stream().map(s -> current.substring(0, current.lastIndexOf(".") + 1) + s).collect(Collectors.toList()) : Collections.emptyList();
+        return end != null ? end.getChildren().keySet().stream().map(s -> (current.startsWith("-") && !current.contains(".") ? "-" : "") + current.substring(0, current.lastIndexOf(".") + 1) + s).collect(Collectors.toList()) : Collections.emptyList();
     }
 }
