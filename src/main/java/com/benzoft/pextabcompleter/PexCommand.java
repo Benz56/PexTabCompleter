@@ -1,6 +1,7 @@
 package com.benzoft.pextabcompleter;
 
 import com.benzoft.pextabcompleter.permissiontree.PermissionNode;
+import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -41,7 +42,10 @@ class PexCommand {
             final int lastWordIndex = input.length - 1;
             final String currentWord = input[lastWordIndex], nextWord = command[lastWordIndex];
             if (nextWord.equalsIgnoreCase("<permission>")) {
-                return getPermissionSuggestions(currentWord);
+                final String prevWord = input[lastWordIndex - 1];
+                if (prevWord.equalsIgnoreCase("remove")) { // Suggest permissions that the group/user has.
+                    return (command[0].equalsIgnoreCase("user") ? PermissionsEx.getUser(input[1]) : PermissionsEx.getPermissionManager().getGroup(input[1])).getAllPermissions().values().stream().flatMap(Collection::stream).distinct().collect(Collectors.toList());
+                } else return getPermissionSuggestions(currentWord);
             } else if (!currentWord.isEmpty() && nextWord.startsWith(currentWord)) return Collections.singletonList(nextWord);
             return nextWord.equalsIgnoreCase("*") ? indexSuggestions.getOrDefault(lastWordIndex, Collections::emptyList).get() : Collections.singletonList(nextWord);
         } catch (final ArrayIndexOutOfBoundsException e) {
